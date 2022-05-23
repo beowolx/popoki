@@ -1,0 +1,15 @@
+[package]
+name = "popoki"
+version = "0.1.0"
+authors = ["Luis Cardoso <luis@luiscardoso.dev>"]
+edition = "2021"
+
+# Profile setup https://doc.rust-lang.org/cargo/reference/profiles.html
+# TL;DR: optimises for code gen size and strip out unnecessary assembly instructions
+[profile.release]
+panic = "abort"
+lto = true # invokes the dark magic from LLVM's to link time optimizations (LTO)
+codegen-units=1 # optimise code gen size
+opt-level="s" # optimise for binary size
+
+[dependencies]
