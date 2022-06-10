@@ -1,16 +1,16 @@
-use crate::{Guess, Guesser};
+use popoki::{Guess, Guesser};
 
 pub struct Naive;
 
 impl Naive {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Naive
     }
 }
 
 impl Default for Naive {
     fn default() -> Self {
-        Naive::new()
+        Self::new()
     }
 }
 
