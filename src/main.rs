@@ -1,6 +1,10 @@
 #![warn(clippy::all, clippy::nursery, clippy::pedantic, clippy::restriction)]
 #![allow(clippy::missing_docs_in_private_items)]
-#![allow(clippy::implicit_return)]
+#![allow(
+    clippy::implicit_return,
+    clippy::separated_literal_suffix,
+    clippy::blanket_clippy_restriction_lints
+)]
 
 mod algorithms;
 
