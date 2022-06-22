@@ -19,3 +19,4 @@ codegen-units=1 # optimise code gen size
 opt-level="s" # optimise for binary size
 
 [dependencies]
+itertools = "0.10"
