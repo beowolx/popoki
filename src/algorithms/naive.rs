@@ -22,7 +22,6 @@ impl Naive {
         }
     }
 }
-
 impl Default for Naive {
     fn default() -> Self {
         Self::new()
@@ -40,6 +39,9 @@ impl Guesser for Naive {
         if let Some(last) = history.last() {
             self.remaining.retain(|word, _| last.matches(word));
         }
+        if history.is_empty() {
+            return "tares".to_owned();
+        }
 
         let remaining_count: usize = self.remaining.iter().map(|(_, &c)| c).sum();
 
@@ -47,23 +49,24 @@ impl Guesser for Naive {
         for word in self.remaining.keys() {
             let mut sum = 0.0_f64;
             for pattern in Correctness::patterns() {
-                // considering a world where we _did_ guess `word`and got `pattern`as the correctness.
-                // now, compute what _then_ is left.
-                let in_pattern_total: usize = 0;
+                let mut in_pattern_total: usize = 0;
                 for (candidate, count) in &self.remaining {
                     let g = Guess {
                         word: (*word).to_owned(),
                         mask: pattern,
                     };
                     g.matches(candidate)
-                        .then(|| in_pattern_total.saturating_add(*count));
+                        .then(|| in_pattern_total = in_pattern_total.saturating_add(*count));
                 }
+                if in_pattern_total == 0 {
+                    continue;
+                }
+                // TODO: apply sigmoid
                 let p_of_this_pattern = in_pattern_total as f64 / remaining_count as f64;
-                // - SUM_i p_i * log_2(p_i)
                 sum += p_of_this_pattern * p_of_this_pattern.log2();
             }
-            let goodness = 0.0_f64 - sum;
-            if let Some(ref c) = best {
+            let goodness = -sum;
+            if let Some(c) = best {
                 if goodness > c.goodness {
                     best = Some(Candidate { word, goodness });
                 }
@@ -71,6 +74,8 @@ impl Guesser for Naive {
                 best = Some(Candidate { word, goodness });
             }
         }
-        best.unwrap().word.to_owned()
+
+        // Return the best guess OR a default value (it shouldn't never happen though)
+        best.map_or("popoki".to_owned(), |c| c.word.to_owned())
     }
 }
