@@ -20,3 +20,4 @@ opt-level="s" # optimise for binary size
 
 [dependencies]
 itertools = "0.10"
+clap = { version = "3", features = ["derive"]}
