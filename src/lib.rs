@@ -121,9 +121,9 @@ impl Guess<'_> {
         let mut used = [false; 5];
         for (i, ((g, &m), w)) in self
             .word
-            .chars()
+            .bytes()
             .zip(&self.mask)
-            .zip(word.chars())
+            .zip(word.bytes())
             .enumerate()
         {
             if m == Correctness::Correct {
@@ -135,7 +135,7 @@ impl Guess<'_> {
             }
         }
 
-        for (i, (w, &m)) in word.chars().zip(&self.mask).enumerate() {
+        for (i, (w, &m)) in word.bytes().zip(&self.mask).enumerate() {
             if m == Correctness::Correct {
                 // must be correct, or we'd have returned in the earlier loop
                 continue;
@@ -143,7 +143,7 @@ impl Guess<'_> {
             let mut plausible = true;
             if self
                 .word
-                .chars()
+                .bytes()
                 .zip(&self.mask)
                 .enumerate()
                 .any(|(j, (g, m))| {
