@@ -1,12 +1,12 @@
 use popoki::{Correctness, Guess, Guesser, DICTIONARY};
 use std::{borrow::Cow, collections::HashMap};
 
-pub struct Naive {
+pub struct Allocs {
     remaining: HashMap<&'static str, usize>,
 }
 
 #[allow(clippy::expect_used)]
-impl Naive {
+impl Allocs {
     pub fn new() -> Self {
         Self {
             remaining: DICTIONARY
@@ -22,7 +22,7 @@ impl Naive {
         }
     }
 }
-impl Default for Naive {
+impl Default for Allocs {
     fn default() -> Self {
         Self::new()
     }
@@ -34,7 +34,7 @@ struct Candidate {
     goodness: f64,
 }
 
-impl Guesser for Naive {
+impl Guesser for Allocs {
     fn guess(&mut self, history: &[Guess]) -> String {
         if let Some(last) = history.last() {
             self.remaining.retain(|word, _| last.matches(word));
@@ -52,7 +52,8 @@ impl Guesser for Naive {
                 let mut in_pattern_total: usize = 0;
                 for (candidate, count) in &self.remaining {
                     let g = Guess {
-                        word: Cow::Owned((*word).to_owned()),
+                        // Here we do not allocate a new copy of the string for a new guess
+                        word: Cow::Borrowed(word),
                         mask: pattern,
                     };
                     g.matches(candidate)

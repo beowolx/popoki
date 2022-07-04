@@ -40,12 +40,14 @@ struct Args {
 #[derive(Parser, ValueEnum, Clone)]
 enum Implementation {
     Naive,
+    Allocs,
 }
 
 fn main() {
     let args = Args::parse();
     match args.implementation {
         Implementation::Naive => play(algorithms::Naive::new, args.max),
+        Implementation::Allocs => play(algorithms::Allocs::new, args.max),
     }
 }
 
