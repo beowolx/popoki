@@ -64,7 +64,7 @@ impl Correctness {
 
         // Mark things green
         for (i, item) in c.iter_mut().enumerate() {
-            if answer.chars().nth(i) == guess.chars().nth(i) {
+            if answer.as_bytes().get(i) == guess.as_bytes().get(i) {
                 *item = Correctness::Correct;
             }
         }
@@ -77,12 +77,12 @@ impl Correctness {
         }
 
         // Mark things yellow
-        for (i, g) in guess.chars().enumerate() {
+        for (i, g) in guess.bytes().enumerate() {
             if c[i] == Correctness::Correct {
                 // Already marked as green
                 continue;
             }
-            if answer.chars().enumerate().any(|(i, a)| {
+            if answer.bytes().enumerate().any(|(i, a)| {
                 if a == g && !used[i] {
                     used[i] = true;
                     return true;
