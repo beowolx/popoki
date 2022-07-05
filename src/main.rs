@@ -41,6 +41,7 @@ struct Args {
 enum Implementation {
     Naive,
     Allocs,
+    Vecrem,
 }
 
 fn main() {
@@ -48,6 +49,7 @@ fn main() {
     match args.implementation {
         Implementation::Naive => play(algorithms::Naive::new, args.max),
         Implementation::Allocs => play(algorithms::Allocs::new, args.max),
+        Implementation::Vecrem => play(algorithms::Vecrem::new, args.max),
     }
 }
 
