@@ -8,11 +8,14 @@ pub struct Wordle {
 impl Wordle {
     pub fn new() -> Self {
         Self {
-            dictionary: HashSet::from_iter(DICTIONARY.lines().map(|line| {
-                line.split_once(' ')
-                    .expect("every line is word + space + frequency")
-                    .0
-            })),
+            dictionary: DICTIONARY
+                .lines()
+                .map(|line| {
+                    line.split_once(' ')
+                        .expect("every line is word + space + frequency")
+                        .0
+                })
+                .collect(),
         }
     }
 

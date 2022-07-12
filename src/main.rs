@@ -42,6 +42,7 @@ enum Implementation {
     Naive,
     Allocs,
     Vecrem,
+    Once,
 }
 
 fn main() {
@@ -50,6 +51,7 @@ fn main() {
         Implementation::Naive => play(algorithms::Naive::new, args.max),
         Implementation::Allocs => play(algorithms::Allocs::new, args.max),
         Implementation::Vecrem => play(algorithms::Vecrem::new, args.max),
+        Implementation::Once => play(algorithms::OnceInit::new, args.max),
     }
 }
 
