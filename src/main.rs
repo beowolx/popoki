@@ -9,7 +9,8 @@
     clippy::as_conversions,
     clippy::print_stderr,
     clippy::print_stdout,
-    clippy::option_if_let_else
+    clippy::option_if_let_else,
+    clippy::expect_used
 )]
 
 use clap::{Parser, ValueEnum};
@@ -61,9 +62,13 @@ where
 {
     let w = popoki::Wordle::new();
     for answer in GAMES.split_whitespace().take(max) {
+        let answer_b: popoki::Word = answer
+            .as_bytes()
+            .try_into()
+            .expect("all answers are 5 letters");
         let guesser = (mk)();
 
-        if let Some(score) = w.play(answer, guesser) {
+        if let Some(score) = w.play(answer_b, guesser) {
             println!("Guessed '{answer}' in {score}");
         } else {
             eprintln!("Failed to guess");

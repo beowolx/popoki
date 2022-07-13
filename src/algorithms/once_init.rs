@@ -1,11 +1,11 @@
 use once_cell::sync::OnceCell;
-use popoki::{Correctness, Guess, Guesser, DICTIONARY};
+use popoki::{Correctness, Guess, Guesser, Word, DICTIONARY};
 use std::borrow::Cow;
 
-static INITIAL: OnceCell<Vec<(&'static str, usize)>> = OnceCell::new();
+static INITIAL: OnceCell<Vec<(&'static Word, usize)>> = OnceCell::new();
 
 pub struct OnceInit {
-    remaining: Cow<'static, Vec<(&'static str, usize)>>,
+    remaining: Cow<'static, Vec<(&'static Word, usize)>>,
 }
 
 #[allow(clippy::expect_used)]
@@ -20,7 +20,11 @@ impl OnceInit {
                             .split_once(' ')
                             .expect("every line is word + space + frequency");
                         let count_parsed: usize = count.parse().expect("every count is a number");
-                        (word, count_parsed)
+                        let word_bytes = word
+                            .as_bytes()
+                            .try_into()
+                            .expect("every dictionary word is 5 characters");
+                        (word_bytes, count_parsed)
                     })
                     .collect()
             })),
@@ -35,12 +39,12 @@ impl Default for OnceInit {
 
 #[derive(Debug, Copy, Clone)]
 struct Candidate {
-    word: &'static str,
+    word: &'static Word,
     goodness: f64,
 }
 
 impl Guesser for OnceInit {
-    fn guess(&mut self, history: &[Guess]) -> String {
+    fn guess(&mut self, history: &[Guess]) -> Word {
         if let Some(last) = history.last() {
             if matches!(self.remaining, Cow::Owned(_)) {
                 self.remaining
@@ -55,12 +59,9 @@ impl Guesser for OnceInit {
                         .collect(),
                 );
             }
-            // self.remaining
-            //     .to_mut()
-            //     .retain(|&(word, _)| last.matches(word));
         }
         if history.is_empty() {
-            return "tares".to_owned();
+            return *b"tares";
         }
 
         let remaining_count: usize = self.remaining.iter().map(|&(_, c)| c).sum();
@@ -97,6 +98,6 @@ impl Guesser for OnceInit {
         }
 
         // Return the best guess OR a default value (it shouldn't never happen though)
-        best.map_or("popoki".to_owned(), |c| c.word.to_owned())
+        best.map_or(*b"cigar", |c| *c.word)
     }
 }
