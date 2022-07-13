@@ -1,12 +1,12 @@
 use popoki::{Correctness, Guess, Guesser, Word, DICTIONARY};
-use std::{borrow::Cow, collections::HashMap};
+use std::borrow::Cow;
 
-pub struct Naive {
-    remaining: HashMap<&'static Word, usize>,
+pub struct Vecrem {
+    remaining: Vec<(&'static Word, usize)>,
 }
 
 #[allow(clippy::expect_used)]
-impl Naive {
+impl Vecrem {
     pub fn new() -> Self {
         Self {
             remaining: DICTIONARY
@@ -26,7 +26,7 @@ impl Naive {
         }
     }
 }
-impl Default for Naive {
+impl Default for Vecrem {
     fn default() -> Self {
         Self::new()
     }
@@ -38,29 +38,30 @@ struct Candidate {
     goodness: f64,
 }
 
-impl Guesser for Naive {
+impl Guesser for Vecrem {
     fn guess(&mut self, history: &[Guess]) -> Word {
         if let Some(last) = history.last() {
-            self.remaining.retain(|word, _| last.matches(word));
+            self.remaining.retain(|&(word, _)| last.matches(word));
         }
         if history.is_empty() {
             return *b"tares";
         }
 
-        let remaining_count: usize = self.remaining.iter().map(|(_, &c)| c).sum();
+        let remaining_count: usize = self.remaining.iter().map(|&(_, c)| c).sum();
 
         let mut best: Option<Candidate> = None;
-        for word in self.remaining.keys() {
+        for &(word, _) in &self.remaining {
             let mut sum = 0.0_f64;
             for pattern in Correctness::patterns() {
                 let mut in_pattern_total: usize = 0;
-                for (candidate, count) in &self.remaining {
+                for &(candidate, count) in &self.remaining {
                     let g = Guess {
-                        word: Cow::Owned((*word).to_owned()),
+                        // Here we do not allocate a new copy of the string for a new guess
+                        word: Cow::Borrowed(word),
                         mask: pattern,
                     };
                     g.matches(candidate)
-                        .then(|| in_pattern_total = in_pattern_total.saturating_add(*count));
+                        .then(|| in_pattern_total = in_pattern_total.saturating_add(count));
                 }
                 if in_pattern_total == 0 {
                     continue;
