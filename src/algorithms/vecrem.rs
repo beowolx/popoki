@@ -43,8 +43,13 @@ impl Guesser for Vecrem {
         if let Some(last) = history.last() {
             self.remaining.retain(|&(word, _)| last.matches(word));
         }
+
+        // We use `trace` here as popoki's opening guess
+        // because it has a high average score  of 10.01 (5.83 + 4.18)
+        // based on a two steps approach: expected information (entropy E[i]) +
+        // weighted average to guess second word.
         if history.is_empty() {
-            return *b"tares";
+            return *b"trace";
         }
 
         let remaining_count: usize = self.remaining.iter().map(|&(_, c)| c).sum();

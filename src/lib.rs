@@ -32,6 +32,11 @@ impl Wordle {
         // purposes.
         for i in 1..=32 {
             let guess = guesser.guess(&history);
+
+            //TODO: Remove it
+            let w = String::from_utf8(guess.to_vec()).expect("HI");
+            println!("Popoki is guessing... {:?}", w);
+
             if guess == answer {
                 return Some(i);
             }
