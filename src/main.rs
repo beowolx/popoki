@@ -44,6 +44,7 @@ enum Implementation {
     Allocs,
     Vecrem,
     Once,
+    Weight,
 }
 
 fn main() {
@@ -53,6 +54,7 @@ fn main() {
         Implementation::Allocs => play(algorithms::Allocs::new, args.max),
         Implementation::Vecrem => play(algorithms::Vecrem::new, args.max),
         Implementation::Once => play(algorithms::OnceInit::new, args.max),
+        Implementation::Weight => play(algorithms::Weight::new, args.max),
     }
 }
 
@@ -61,17 +63,24 @@ where
     G: Guesser,
 {
     let w = popoki::Wordle::new();
+    let mut score: usize = 0;
+    let mut games = 0_i32;
     for answer in GAMES.split_whitespace().take(max) {
         let answer_b: popoki::Word = answer
             .as_bytes()
             .try_into()
             .expect("all answers are 5 letters");
         let guesser = (mk)();
-
-        if let Some(score) = w.play(answer_b, guesser) {
-            println!("Guessed '{answer}' in {score}");
+        if let Some(s) = w.play(answer_b, guesser) {
+            games = games.saturating_add(1_i32);
+            score = score.saturating_add(s);
+            println!("Guessed '{answer}' in {s}");
         } else {
             eprintln!("Failed to guess");
         }
     }
+    println!(
+        "The average guess score is: {:.2}",
+        score as f64 / f64::from(games)
+    );
 }

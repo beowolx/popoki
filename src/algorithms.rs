@@ -9,3 +9,6 @@ pub use vecrem::Vecrem;
 
 mod once_init;
 pub use once_init::OnceInit;
+
+mod weight;
+pub use weight::Weight;
